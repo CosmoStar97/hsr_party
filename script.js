@@ -7,7 +7,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const fiveStarWeightInput = document.getElementById('fiveStarWeight');
     const updateWeightButton = document.getElementById('updateWeightButton');
     const toggleAllSelectionButton = document.getElementById('toggleAllSelectionButton'); // Toggle all selected/deselected button
-    const resetDrawPoolButton = document.getElementById('resetDrawPoolButton'); // 새로 추가된 뽑기 풀 초기화 버튼
+    const resetDrawPoolButton = document.getElementById('resetDrawPoolButton'); // 뽑기 풀 초기화 버튼
+
+    // 새로운 숫자 뽑기 관련 DOM 요소
+    const drawNumberButton = document.getElementById('drawNumberButton');
+    const drawnNumberDisplay = document.getElementById('drawnNumberDisplay');
+
 
     const pathFilterButtons = document.getElementById('pathFilterButtons');
     const elementFilterButtons = document.getElementById('elementFilterButtons');
@@ -34,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
             activeElementFilters.add('all');
             activeRarityFilters.add('all');
             renderCharacterSelection();
-            resetDrawPool();
+            resetDrawPool(); // 캐릭터 로드 후 초기화 호출
         } catch (error) {
             console.error('Error fetching characters:', error);
         }
@@ -107,20 +112,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 cardElement.classList.add('selected-4star');
             }
         }
-        resetDrawPool(); // 선택된 캐릭터 변경 시 뽑기 풀 초기화
+        resetDrawPool();
     };
 
-    // Function to create the draw pool from selected characters
+    // Function to update draw button states (not for character count buttons anymore)
     const resetDrawPool = () => {
-        if (selectedCharacters.size === 0) {
-            console.warn('뽑기 풀이 비어있습니다. 캐릭터를 선택해주세요.');
-            randomizeButton.disabled = true;
-            randomizeOneButton.disabled = true;
-        } else {
-            randomizeButton.disabled = false;
-            randomizeOneButton.disabled = false;
-        }
+        const hasSelectedChars = selectedCharacters.size > 0;
+        randomizeButton.disabled = !hasSelectedChars; // 4명 뽑기 버튼
+        randomizeOneButton.disabled = !hasSelectedChars; // 1명 뽑기 버튼
+        // 숫자 뽑기 버튼은 캐릭터 선택과 무관하므로 항상 활성화 (drawNumberButton.disabled = false;)
     };
+
 
     // Function to draw random characters (중복 방지 로직 추가됨)
     const drawCharacter = (count = 1) => {
@@ -145,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (let j = 0; j < fiveStarWeight * 10; j++) {
                     currentDrawPool.push(char);
                 }
-            } else {
+            } else { // 4성 캐릭터
                 for (let j = 0; j < 10; j++) { // 4성 캐릭터도 가중치 1.0처럼 10번 추가 (공정한 비교를 위해)
                     currentDrawPool.push(char);
                 }
@@ -156,6 +158,36 @@ document.addEventListener('DOMContentLoaded', () => {
             drawnTeamContainer.innerHTML = '<p>뽑을 수 있는 캐릭터가 없습니다 (가중치 설정 확인).</p>';
             return;
         }
+
+        // 유니크한 캐릭터 수 확인 (개척자 중복 제외)
+        const uniqueSelectableCharacters = new Set();
+        let pioneerFoundInSelection = false;
+        tempDrawPool.forEach(char => {
+            if (char.name.includes('개척자')) {
+                if (!pioneerFoundInSelection) { // 첫 개척자만 세트에 추가
+                    uniqueSelectableCharacters.add('AnyPioneer'); // 개척자를 하나로 묶어서 처리
+                    pioneerFoundInSelection = true;
+                }
+            } else {
+                uniqueSelectableCharacters.add(char.name);
+            }
+        });
+
+        // 실제 뽑을 수 있는 유니크 캐릭터의 총 수
+        const actualUniqueCount = uniqueSelectableCharacters.size;
+
+        // 만약 선택된 유니크 캐릭터 수가 요청된 뽑기 횟수보다 적으면 경고
+        if (actualUniqueCount < count) {
+            console.warn(`선택된 유니크 캐릭터 수 (${actualUniqueCount}명)가 요청된 뽑기 횟수 (${count}명)보다 적습니다.`);
+            if (actualUniqueCount === 0) {
+                 drawnTeamContainer.innerHTML = '<p>뽑을 수 있는 유니크 캐릭터가 없습니다. 캐릭터를 더 선택하거나 뽑기 횟수를 줄여주세요.</p>';
+                 return;
+            }
+             // 뽑을 수 있는 최대 유니크 캐릭터 수로 조정 (사용자 경험 개선)
+            count = actualUniqueCount;
+            drawnTeamContainer.innerHTML = `<p style="color: yellow;">경고: 선택된 유니크 캐릭터 부족! ${count}명만 뽑습니다.</p>`;
+        }
+
 
         for (let i = 0; i < count; i++) {
             if (currentDrawPool.length === 0) {
@@ -171,14 +203,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const randomIndex = Math.floor(Math.random() * currentDrawPool.length);
                 const potentialChar = currentDrawPool[randomIndex];
 
-                // **개선된 중복 및 개척자 중복 확인 로직**
-                const isPioneer = potentialChar.name.includes('개척자');
+                const isPotentialPioneer = potentialChar.name.includes('개척자');
 
                 let isDuplicate = drawnNames.has(potentialChar.name); // 일반 캐릭터 이름 중복 확인
                 let isPioneerConflict = false;
 
                 // 이미 개척자가 뽑혔는데, 또 다른 개척자를 뽑으려는 경우
-                if (isPioneer && hasPioneer) {
+                if (isPotentialPioneer && hasPioneer) {
                     isPioneerConflict = true;
                 }
 
@@ -187,12 +218,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     drawnTeam.push(characterToDraw);
                     drawnNames.add(characterToDraw.name);
 
-                    if (isPioneer) { // 뽑힌 캐릭터가 개척자라면 플래그 설정
+                    if (isPotentialPioneer) { // 뽑힌 캐릭터가 개척자라면 플래그 설정
                         hasPioneer = true;
                     }
 
                     // 뽑힌 캐릭터는 다음 뽑기에서 제외하기 위해 currentDrawPool에서 제거 (모든 인스턴스 제거)
-                    // 이 부분에서 5성 가중치를 10으로 곱했으므로, 4성도 10으로 곱해야 공정하게 제거됨
                     currentDrawPool = currentDrawPool.filter(char => char.name !== characterToDraw.name);
                 }
                 attemptCount++;
@@ -200,7 +230,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (characterToDraw === null) {
                 console.warn('충분한 유니크한 캐릭터를 뽑을 수 없습니다. 선택된 캐릭터와 뽑기 횟수를 확인하세요.');
-                // 뽑기 횟수보다 뽑을 수 있는 유니크 캐릭터 수가 적을 때 발생할 수 있음
                 break;
             }
         }
@@ -226,8 +255,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Event Listeners
-    randomizeButton.addEventListener('click', () => drawCharacter(4));
-    randomizeOneButton.addEventListener('click', () => drawCharacter(1));
+    randomizeButton.addEventListener('click', () => drawCharacter(4)); // 기존 4명 뽑기 버튼 유지
+    randomizeOneButton.addEventListener('click', () => drawCharacter(1)); // 기존 1명 뽑기 버튼 유지
+
+    // 숫자 뽑기 버튼 이벤트 리스너 수정
+    drawNumberButton.addEventListener('click', () => {
+        const randomNumber = Math.floor(Math.random() * 4) + 1; // 1부터 4까지의 랜덤 숫자 생성
+        drawnNumberDisplay.textContent = `${randomNumber} 리롤`; // 결과에 '리롤' 추가
+    });
+
 
     updateWeightButton.addEventListener('click', () => {
         const newWeight = parseFloat(fiveStarWeightInput.value);
@@ -282,6 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resetDrawPool();
         displayDrawnTeam([]);
         drawnTeamContainer.innerHTML = '<p>팀을 뽑아보세요!</p>';
+        drawnNumberDisplay.textContent = '? 리롤'; // 뽑기 풀 초기화 시 숫자도 초기화
     });
 
     // Helper function to setup filter buttons
