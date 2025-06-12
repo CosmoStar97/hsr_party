@@ -72,7 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
         filteredCharacters.forEach(char => {
             const card = document.createElement('div');
             card.classList.add('character-card');
-            // ⭐ 변경된 부분: 초기 렌더링 시 등급에 따른 클래스 추가 ⭐
             if (selectedCharacters.has(char.name)) {
                 if (char.rarity === 5) {
                     card.classList.add('selected-5star');
@@ -90,20 +89,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>${char.name}</p>
                 ${createRarityStars(char.rarity)} `;
 
-            card.addEventListener('click', () => toggleCharacterSelection(char.name, char.rarity, card)); // rarity 인자 추가
+            card.addEventListener('click', () => toggleCharacterSelection(char.name, char.rarity, card));
             characterGrid.appendChild(card);
         });
     };
 
     // Function to toggle character selection
-    const toggleCharacterSelection = (characterName, characterRarity, cardElement) => { // characterRarity 인자 추가
+    const toggleCharacterSelection = (characterName, characterRarity, cardElement) => {
         if (selectedCharacters.has(characterName)) {
             selectedCharacters.delete(characterName);
-            // ⭐ 변경된 부분: 기존의 등급별 클래스 제거 ⭐
             cardElement.classList.remove('selected-4star', 'selected-5star');
         } else {
             selectedCharacters.add(characterName);
-            // ⭐ 변경된 부분: 등급에 따른 클래스 추가 ⭐
             if (characterRarity === 5) {
                 cardElement.classList.add('selected-5star');
             } else if (characterRarity === 4) {
@@ -117,7 +114,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const resetDrawPool = () => {
         if (selectedCharacters.size === 0) {
             console.warn('뽑기 풀이 비어있습니다. 캐릭터를 선택해주세요.');
-            // 뽑기 버튼 비활성화 또는 메시지 표시
             randomizeButton.disabled = true;
             randomizeOneButton.disabled = true;
         } else {
@@ -126,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Function to draw 4 random characters
+    // Function to draw random characters (중복 방지 로직 추가됨)
     const drawCharacter = (count = 1) => {
         drawnTeamContainer.innerHTML = ''; // Clear previous team
         const tempDrawPool = Array.from(selectedCharacters).map(name =>
@@ -139,34 +135,73 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const drawnTeam = [];
-        for (let i = 0; i < count; i++) {
-            let characterToDraw = null;
-            let weightedPool = [];
+        const drawnNames = new Set(); // 이미 뽑힌 캐릭터 이름을 저장
+        let hasPioneer = false; // "개척자" 계열 캐릭터가 뽑혔는지 여부
 
-            // 가중치 적용하여 뽑기 풀 생성
-            tempDrawPool.forEach(char => {
-                if (char.rarity === 5) {
-                    for (let j = 0; j < fiveStarWeight * 10; j++) { // fiveStarWeight가 1.0이면 10번, 1.5면 15번 추가 (조절 가능)
-                        weightedPool.push(char);
-                    }
-                } else {
-                    weightedPool.push(char);
+        // 가중치 적용 풀을 동적으로 생성하고, 뽑을 때마다 제거
+        let currentDrawPool = [];
+        tempDrawPool.forEach(char => {
+            if (char.rarity === 5) {
+                for (let j = 0; j < fiveStarWeight * 10; j++) {
+                    currentDrawPool.push(char);
                 }
-            });
-
-            if (weightedPool.length === 0) { // 가중치 풀이 비어있을 경우 (모든 5성 가중치 0 등)
-                weightedPool = tempDrawPool; // 기본 풀로 대체
-                if (weightedPool.length === 0) { // 기본 풀도 비어있으면 중단
-                    console.warn('가중치 풀 및 기본 풀이 비어있습니다.');
-                    break;
+            } else {
+                for (let j = 0; j < 10; j++) { // 4성 캐릭터도 가중치 1.0처럼 10번 추가 (공정한 비교를 위해)
+                    currentDrawPool.push(char);
                 }
             }
+        });
 
-            const randomIndex = Math.floor(Math.random() * weightedPool.length);
-            characterToDraw = weightedPool[randomIndex];
+        if (currentDrawPool.length === 0) {
+            drawnTeamContainer.innerHTML = '<p>뽑을 수 있는 캐릭터가 없습니다 (가중치 설정 확인).</p>';
+            return;
+        }
 
-            if (characterToDraw) {
-                drawnTeam.push(characterToDraw);
+        for (let i = 0; i < count; i++) {
+            if (currentDrawPool.length === 0) {
+                console.warn('뽑을 수 있는 캐릭터가 더 이상 없습니다.');
+                break;
+            }
+
+            let characterToDraw = null;
+            let attemptCount = 0;
+            const maxAttempts = currentDrawPool.length * 2; // 무한 루프 방지 (풀 크기 x 2)
+
+            while (characterToDraw === null && attemptCount < maxAttempts) {
+                const randomIndex = Math.floor(Math.random() * currentDrawPool.length);
+                const potentialChar = currentDrawPool[randomIndex];
+
+                // **개선된 중복 및 개척자 중복 확인 로직**
+                const isPioneer = potentialChar.name.includes('개척자');
+
+                let isDuplicate = drawnNames.has(potentialChar.name); // 일반 캐릭터 이름 중복 확인
+                let isPioneerConflict = false;
+
+                // 이미 개척자가 뽑혔는데, 또 다른 개척자를 뽑으려는 경우
+                if (isPioneer && hasPioneer) {
+                    isPioneerConflict = true;
+                }
+
+                if (!isDuplicate && !isPioneerConflict) {
+                    characterToDraw = potentialChar;
+                    drawnTeam.push(characterToDraw);
+                    drawnNames.add(characterToDraw.name);
+
+                    if (isPioneer) { // 뽑힌 캐릭터가 개척자라면 플래그 설정
+                        hasPioneer = true;
+                    }
+
+                    // 뽑힌 캐릭터는 다음 뽑기에서 제외하기 위해 currentDrawPool에서 제거 (모든 인스턴스 제거)
+                    // 이 부분에서 5성 가중치를 10으로 곱했으므로, 4성도 10으로 곱해야 공정하게 제거됨
+                    currentDrawPool = currentDrawPool.filter(char => char.name !== characterToDraw.name);
+                }
+                attemptCount++;
+            }
+
+            if (characterToDraw === null) {
+                console.warn('충분한 유니크한 캐릭터를 뽑을 수 없습니다. 선택된 캐릭터와 뽑기 횟수를 확인하세요.');
+                // 뽑기 횟수보다 뽑을 수 있는 유니크 캐릭터 수가 적을 때 발생할 수 있음
+                break;
             }
         }
         displayDrawnTeam(drawnTeam);
@@ -175,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to display the drawn team
     const displayDrawnTeam = (team) => {
         if (team.length === 0) {
-            drawnTeamContainer.innerHTML = '<p>아직 뽑힌 팀이 없습니다.</p>';
+            drawnTeamContainer.innerHTML = '<p>팀을 뽑아보세요!</p>';
             return;
         }
         drawnTeamContainer.innerHTML = '';
@@ -199,15 +234,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isNaN(newWeight) && newWeight >= 0) {
             fiveStarWeight = newWeight;
             console.log('5성 캐릭터 확률 가중치 업데이트:', fiveStarWeight);
-            // 가중치 변경 시 뽑기 풀을 초기화할 필요는 없지만, 뽑기 로직에 적용될 것이므로 괜찮음.
         } else {
             alert('유효한 숫자를 입력해주세요.');
-            fiveStarWeightInput.value = fiveStarWeight; // 유효하지 않으면 이전 값으로 되돌림
+            fiveStarWeightInput.value = fiveStarWeight;
         }
     });
 
     toggleAllSelectionButton.addEventListener('click', () => {
-        // 현재 필터링된 캐릭터 목록을 가져옵니다.
         const filteredCharacters = allCharacters.filter(char => {
             const passesPathFilter = activePathFilters.has('all') || activePathFilters.has(char.path);
             const passesElementFilter = activeElementFilters.has('all') || activeElementFilters.has(char.element);
@@ -215,23 +248,20 @@ document.addEventListener('DOMContentLoaded', () => {
             return passesPathFilter && passesElementFilter && passesRarityFilter;
         });
 
-        // 필터링된 캐릭터 수와 현재 선택된 캐릭터 수가 같으면 모두 해제, 그렇지 않으면 모두 선택
         const areAllFilteredSelected = filteredCharacters.every(char => selectedCharacters.has(char.name));
 
         if (areAllFilteredSelected && filteredCharacters.length > 0) {
             filteredCharacters.forEach(char => {
                 selectedCharacters.delete(char.name);
-                // 해당 카드 요소에서 등급별 클래스 제거 (필터링된 카드만 처리)
                 const cardElement = characterGrid.querySelector(`[data-name="${char.name}"]`);
                 if (cardElement) {
                     cardElement.classList.remove('selected-4star', 'selected-5star');
                 }
             });
         } else {
-            selectedCharacters.clear(); // 전체 선택 전에 기존 선택 초기화
+            selectedCharacters.clear();
             filteredCharacters.forEach(char => {
                 selectedCharacters.add(char.name);
-                // 해당 카드 요소에 등급별 클래스 추가 (필터링된 카드만 처리)
                 const cardElement = characterGrid.querySelector(`[data-name="${char.name}"]`);
                 if (cardElement) {
                     if (char.rarity === 5) {
@@ -242,24 +272,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }
-        // renderCharacterSelection(); // UI 업데이트 (이미 위에서 클래스를 직접 변경했으므로 필요 없을 수 있음)
-        // 위에서 직접 클래스를 조작했으므로, 여기서는 굳이 다시 렌더링할 필요가 없음.
-        // 하지만 혹시 모를 상황을 대비하여 전체 렌더링을 유지하거나,
-        // 더 최적화된 방식으로 선택 상태만 업데이트하도록 변경할 수 있습니다.
-        // 현재는 renderCharacterSelection()이 모든 카드를 다시 그리므로, 위에 클래스 변경 로직과 중복됩니다.
-        // 따라서, toggleAllSelectionButton 클릭 시에는 renderCharacterSelection() 대신,
-        // 단순히 DOM에서 모든 카드를 순회하며 selectedCharacters Set에 따라 클래스를 추가/제거하는 로직이 더 효율적입니다.
-        // 여기서는 간단하게 renderCharacterSelection()을 호출하여 전체를 다시 그리도록 하겠습니다.
-        renderCharacterSelection(); // 변경된 선택 상태를 반영하여 전체 그리드를 다시 그림
-        resetDrawPool(); // 뽑기 풀 업데이트
+        renderCharacterSelection();
+        resetDrawPool();
     });
 
     resetDrawPoolButton.addEventListener('click', () => {
-        selectedCharacters.clear(); // 선택된 모든 캐릭터 해제
-        renderCharacterSelection(); // UI 업데이트 (선택 해제된 상태 반영)
-        resetDrawPool(); // 뽑기 풀 비활성화
-        displayDrawnTeam([]); // 뽑힌 팀 초기화
-        drawnTeamContainer.innerHTML = '<p>팀을 뽑아보세요!</p>'; // 초기 메시지 표시
+        selectedCharacters.clear();
+        renderCharacterSelection();
+        resetDrawPool();
+        displayDrawnTeam([]);
+        drawnTeamContainer.innerHTML = '<p>팀을 뽑아보세요!</p>';
     });
 
     // Helper function to setup filter buttons
@@ -283,17 +305,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const filterValue = button.dataset[filterType];
 
             if (filterValue === allButtonDataValue) {
-                // '모두' 버튼 클릭 시
                 activeFiltersSet.clear();
                 activeFiltersSet.add(allButtonDataValue);
-                // 모든 필터 버튼의 active 클래스 제거
                 container.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
-                // '모두' 버튼만 active 클래스 추가
                 button.classList.add('active');
             } else {
-                // 다른 필터 버튼 클릭 시
                 if (activeFiltersSet.has(allButtonDataValue)) {
-                    activeFiltersSet.delete(allButtonDataValue); // '모두' 필터 해제
+                    activeFiltersSet.delete(allButtonDataValue);
                     if (allButton) {
                         allButton.classList.remove('active');
                     }
@@ -307,7 +325,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     button.classList.add('active');
                 }
 
-                // 특정 필터들이 모두 해제되어 Set이 비게 되면, '모두' 버튼을 다시 활성화
                 if (activeFiltersSet.size === 0) {
                     if (allButton) {
                         allButton.classList.add('active');
@@ -316,23 +333,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             renderCharacterSelection();
-            resetDrawPool(); // 필터 변경 시 뽑기 풀 초기화
+            resetDrawPool();
         });
     }
 
-    // Path 필터 버튼 초기화 및 "모두" 버튼 동적 추가 (HTML에 없다면)
     if (!pathFilterButtons.querySelector('[data-path="all"]')) {
         pathFilterButtons.innerHTML += '<button data-path="all" class="active"><span>모두</span></button>';
     }
     setupFilterButtons('pathFilterButtons', 'path', 'all');
 
-    // Element 필터 버튼 초기화 및 "모두" 버튼 동적 추가 (HTML에 없다면)
     if (!elementFilterButtons.querySelector('[data-element="all"]')) {
         elementFilterButtons.innerHTML += '<button data-element="all" class="active"><span>모두</span></button>';
     }
     setupFilterButtons('elementFilterButtons', 'element', 'all');
 
-    // Rarity 필터 버튼 초기화 ('모두' 버튼은 HTML에 이미 있음)
     setupFilterButtons('rarityFilterButtons', 'rarity', 'all');
 
     // Initial load
