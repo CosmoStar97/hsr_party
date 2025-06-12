@@ -10,6 +10,7 @@ body {
     flex-direction: column;
     align-items: center;
     padding-bottom: 50px;
+    overflow-x: hidden; /* 좌우 스크롤 방지 */
 }
 
 
@@ -408,11 +409,16 @@ header h1 {
     .character-grid {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
         gap: 10px;
+        padding: 10px;
+        justify-content: flex-start; /* 왼쪽 정렬 */
     }
 
 
     .character-card {
         padding: 10px;
+        width: 100%; /* 카드가 그리드 셀을 채우도록 */
+        box-sizing: border-box; /* padding이 width에 포함되도록 */
+        align-items: center; /* 내부 요소 가운데 정렬 (선택 사항) */
     }
 
 
@@ -519,19 +525,22 @@ header h1 {
 
 
     .character-grid {
-        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); /* 더 작은 minmax 값 */
-        gap: 5px; /* 간격 줄임 */
+        grid-template-columns: 1fr; /* 한 줄에 하나씩 표시 */
+        gap: 8px;
         padding: 10px;
+        justify-content: flex-start; /* 왼쪽 정렬 유지 */
     }
     .character-card {
-        padding: 5px; /* 패딩 줄임 */
+        padding: 8px;
+        width: 100%;
+        align-items: center; /* 내부 요소 가운데 정렬 유지 */
     }
     .character-card img {
-        width: 60px; /* 이미지 크기 줄임 */
-        height: 60px;
+        width: 80px;
+        height: 80px;
     }
     .character-card p {
-        font-size: 0.6em; /* 폰트 크기 줄임 */
+        font-size: 0.7em;
     }
 
 
