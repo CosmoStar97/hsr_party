@@ -31,33 +31,36 @@
         <button id="resetDrawPoolButton">뽑기 풀 초기화</button>
     </div>
 
-    <div class="filter-sections">
-        <div class="filter-section path-filter-section">
-            <h3>운명의 길</h3>
-            <div class="filter-buttons" id="pathFilterButtons">
-                <button data-path="all" class="active"><span>모두</span></button>
-                <button data-path="파멸"><img src="images/elements/destruction.webp" alt="파멸"><span>파멸</span></button>
-                <button data-path="수렵"><img src="images/elements/hunt.webp" alt="수렵"><span>수렵</span></button>
-                <button data-path="화합"><img src="images/elements/harmony.webp" alt="화합"><span>화합</span></button>
-                <button data-path="공허"><img src="images/elements/nihility.webp" alt="공허"><span>공허</span></button>
-                <button data-path="보존"><img src="images/elements/preservation.webp" alt="보존"><span>보존</span></button>
-                <button data-path="풍요"><img src="images/elements/abundance.webp" alt="풍요"><span>풍요</span></button>
-                <button data-path="지식"><img src="images/elements/erudition.webp" alt="지식"><span>지식</span></button>
-                <button data-path="기억"><img src="images/elements/remembrance.webp" alt="기억"><span>기억</span></button>
+    <h2>필터</h2>
+    <div class="filter-container">
+        <div id="pathElementFiltersWrapper">
+            <div class="filter-section">
+                <h3>경로</h3>
+                <div class="filter-buttons" id="pathFilterButtons">
+                    <button data-path="all" class="active"><span>모두</span></button>
+                    <button data-path="파멸"><img src="images/paths/destruction.webp" alt="파멸"><span>파멸</span></button>
+                    <button data-path="수렵"><img src="images/paths/hunt.webp" alt="수렵"><span>수렵</span></button>
+                    <button data-path="지식"><img src="images/paths/erudition.webp" alt="지식"><span>지식</span></button>
+                    <button data-path="공허"><img src="images/paths/nihility.webp" alt="공허"><span>공허</span></button>
+                    <button data-path="보존"><img src="images/paths/preservation.webp" alt="보존"><span>보존</span></button>
+                    <button data-path="풍요"><img src="images/paths/abundance.webp" alt="풍요"><span>풍요</span></button>
+                    <button data-path="화합"><img src="images/paths/harmony.webp" alt="화합"><span>화합</span></button>
+                    <button data-path="기억"><img src="images/paths/remembrance.webp" alt="기억"><span>기억</span></button>
+                </div>
             </div>
-        </div>
 
-        <div class="filter-section element-filter-section">
-            <h3>원소</h3>
-            <div class="filter-buttons" id="elementFilterButtons">
-                <button data-element="all" class="active"><span>모두</span></button>
-                <button data-element="물리"><img src="images/elements/physical.webp" alt="물리"><span>물리</span></button>
-                <button data-element="화염"><img src="images/elements/fire.webp" alt="화염"><span>화염</span></button>
-                <button data-element="얼음"><img src="images/elements/ice.webp" alt="얼음"><span>얼음</span></button>
-                <button data-element="번개"><img src="images/elements/lightning.webp" alt="번개"><span>번개</span></button>
-                <button data-element="바람"><img src="images/elements/wind.webp" alt="바람"><span>바람</span></button>
-                <button data-element="양자"><img src="images/elements/quantum.webp" alt="양자"><span>양자</span></button>
-                <button data-element="허수"><img src="images/elements/imaginary.webp" alt="허수"><span>허수</span></button>
+            <div class="filter-section">
+                <h3>원소</h3>
+                <div class="filter-buttons" id="elementFilterButtons">
+                    <button data-element="all" class="active"><span>모두</span></button>
+                    <button data-element="물리"><img src="images/elements/physical.webp" alt="물리"><span>물리</span></button>
+                    <button data-element="화염"><img src="images/elements/fire.webp" alt="화염"><span>화염</span></button>
+                    <button data-element="얼음"><img src="images/elements/ice.webp" alt="얼음"><span>얼음</span></button>
+                    <button data-element="번개"><img src="images/elements/lightning.webp" alt="번개"><span>번개</span></button>
+                    <button data-element="바람"><img src="images/elements/wind.webp" alt="바람"><span>바람</span></button>
+                    <button data-element="양자"><img src="images/elements/quantum.webp" alt="양자"><span>양자</span></button>
+                    <button data-element="허수"><img src="images/elements/imaginary.webp" alt="허수"><span>허수</span></button>
+                </div>
             </div>
         </div>
 
