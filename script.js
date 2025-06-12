@@ -260,8 +260,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 숫자 뽑기 버튼 이벤트 리스너 수정
     drawNumberButton.addEventListener('click', () => {
-        const randomNumber = Math.floor(Math.random() * 4) + 1; // 1부터 4까지의 랜덤 숫자 생성
-        drawnNumberDisplay.textContent = `${randomNumber} 리롤`; // 결과에 '리롤' 추가
+        // 1, 2, 3, 4, "Reroll" 중 하나를 뽑기 위한 배열
+        const options = ['1', '2', '3', '4', 'Reroll'];
+        const randomIndex = Math.floor(Math.random() * options.length);
+        const result = options[randomIndex];
+        drawnNumberDisplay.textContent = result; // 결과 표시
     });
 
 
@@ -318,7 +321,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resetDrawPool();
         displayDrawnTeam([]);
         drawnTeamContainer.innerHTML = '<p>팀을 뽑아보세요!</p>';
-        drawnNumberDisplay.textContent = '? 리롤'; // 뽑기 풀 초기화 시 숫자도 초기화
+        drawnNumberDisplay.textContent = '?'; // 뽑기 풀 초기화 시 숫자도 초기화
     });
 
     // Helper function to setup filter buttons
