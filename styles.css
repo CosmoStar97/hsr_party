@@ -224,7 +224,7 @@ header h1 {
 }
 
 /* ========================================= */
-/* --- 캐릭터 카드 내 별 아이콘 스타일 --- */
+/* --- 캐릭터 카드 내 별 아이콘 및 이미지 스타일 --- */
 /* ========================================= */
 
 .character-selection {
@@ -258,7 +258,7 @@ header h1 {
     flex-direction: column;
     align-items: center;
     position: relative; /* 자식 요소의 absolute 위치 지정을 위해 필요 */
-    overflow: hidden; /* 별이 카드를 넘치지 않도록 숨김 */
+    overflow: hidden;
 }
 
 .character-card:hover {
@@ -269,10 +269,10 @@ header h1 {
 .character-card img {
     width: 100px;
     height: 100px;
-    border-radius: 50%;
+    /* border-radius: 50%; 제거 */
     object-fit: cover;
-    border: 2px solid #444;
-    position: relative; /* z-index를 적용하기 위해 필요 */
+    /* border: 2px solid #444; 제거 */
+    position: relative;
     z-index: 1; /* 별 아이콘보다 낮은 z-index */
 }
 
@@ -282,7 +282,7 @@ header h1 {
     font-weight: bold;
     color: #f0f0f0;
     word-break: keep-all;
-    position: relative; /* 텍스트도 z-index를 가질 수 있도록 */
+    position: relative;
     z-index: 2; /* 별 아이콘 위에 텍스트가 보이도록 */
 }
 
@@ -303,14 +303,15 @@ header h1 {
 
 /* 캐릭터 카드 내 별 아이콘 컨테이너의 특정 위치 */
 .character-card .rarity-icons-container {
-    bottom: 55px; /* 캐릭터 이미지 위에 적절히 위치 (조정 필요) */
+    bottom: 0px; /* 이미지 하단에 딱 붙도록 조정 */
+    margin-bottom: 5px; /* 이미지와 텍스트 사이에 여백 */
 }
 
 .rarity-icon {
     height: 15px; /* 별 아이콘 크기 조정 */
-    width: 15px; /* 이미지 비율 유지를 위해 width도 설정 */
-    margin: 0 1px; /* 별 아이콘 간격 조정 */
-    vertical-align: middle; /* 텍스트와 함께 사용할 경우 수직 정렬 */
+    width: 15px;
+    margin: 0 1px;
+    vertical-align: middle;
 }
 
 .character-card.selected-4star {
@@ -324,7 +325,7 @@ header h1 {
 }
 
 /* ========================================= */
-/* --- 뽑힌 팀 카드 스타일 (별 아이콘 조정) --- */
+/* --- 뽑힌 팀 카드 스타일 (별 아이콘 및 이미지 조정) --- */
 /* ========================================= */
 .selected-team-display {
     width: 90%;
@@ -361,16 +362,16 @@ header h1 {
     flex-direction: column;
     align-items: center;
     position: relative; /* 자식 요소의 absolute 위치 지정을 위해 추가 */
-    overflow: hidden; /* 별이 카드를 넘치지 않도록 숨김 */
+    overflow: hidden;
 }
 
 .team-card img {
-    width: 80px; /* 캐릭터 카드보다 작은 크기 */
+    width: 80px;
     height: 80px;
-    border-radius: 50%;
+    /* border-radius: 50%; 제거 */
     object-fit: cover;
-    border: 2px solid #555;
-    position: relative; /* z-index를 적용하기 위해 추가 */
+    /* border: 2px solid #555; 제거 */
+    position: relative;
     z-index: 1; /* 별 아이콘보다 낮은 z-index */
 }
 
@@ -380,20 +381,21 @@ header h1 {
     font-weight: bold;
     color: #f0f0f0;
     word-break: keep-all;
-    position: relative; /* 텍스트도 z-index를 가질 수 있도록 추가 */
+    position: relative;
     z-index: 2; /* 별 아이콘 위에 텍스트가 보이도록 */
 }
 
 /* 팀 카드 내 별 아이콘 컨테이너의 특정 위치 (team-card에 종속) */
 .team-card .rarity-icons-container {
-    bottom: 45px; /* 이미지 크기에 맞춰 조정 (80px 이미지의 경우 45px가 적절) */
+    bottom: 0px; /* 이미지 하단에 딱 붙도록 조정 */
+    margin-bottom: 3px; /* 이미지와 텍스트 사이에 여백 */
     /* 기존 rarity-icons-container의 공통 스타일 상속 */
 }
 
 .team-card .rarity-icon {
-    height: 12px; /* 팀 카드 별 아이콘 크기 조정 (캐릭터 카드보다 작게) */
+    height: 12px;
     width: 12px;
-    margin: 0 0.5px; /* 팀 카드 별 아이콘 간격 조정 */
+    margin: 0 0.5px;
 }
 
 
@@ -512,7 +514,8 @@ header h1 {
 
     /* 모바일에서 캐릭터 카드 별 아이콘 위치 조정 */
     .character-card .rarity-icons-container {
-        bottom: 38px;
+        bottom: 0px; /* 이미지 하단에 딱 붙도록 조정 */
+        margin-bottom: 3px;
     }
 
     .character-card p {
@@ -532,11 +535,12 @@ header h1 {
 
     /* 모바일에서 팀 카드 별 아이콘 위치 조정 */
     .team-card .rarity-icons-container {
-        bottom: 30px; /* 60px 이미지의 경우 30px가 적절 */
+        bottom: 0px; /* 이미지 하단에 딱 붙도록 조정 */
+        margin-bottom: 2px;
     }
 
     .team-card .rarity-icon {
-        height: 10px; /* 모바일 팀 카드 별 아이콘 크기 조정 */
+        height: 10px;
         width: 10px;
     }
 }
@@ -550,7 +554,8 @@ header h1 {
         height: 55px;
     }
     .character-card .rarity-icons-container {
-        bottom: 30px;
+        bottom: 0px;
+        margin-bottom: 2px;
     }
     .character-card p {
         font-size: 0.65em;
