@@ -13,6 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const elementFilterButtons = document.getElementById('elementFilterButtons');
     const rarityFilterButtons = document.getElementById('rarityFilterButtons');
 
+    // ===== 번호 뽑기 관련 요소 추가 =====
+    const drawNumberButton = document.getElementById('drawNumberButton');
+    const rerollToggle = document.getElementById('rerollToggle');
+    const numberDrawResult = document.getElementById('numberDrawResult');
+    // ===================================
+
     // Global State Variables
     let allCharacters = []; // All character data
     let selectedCharacters = new Set(); // Currently selected character names (using Set for unique names)
@@ -283,6 +289,22 @@ document.addEventListener('DOMContentLoaded', () => {
         displayDrawnTeam([]);
         drawnTeamContainer.innerHTML = '<p>팀을 뽑아보세요!</p>';
     });
+
+    // ===== 번호 뽑기 버튼 이벤트 리스너 추가 =====
+    if (drawNumberButton) {
+        drawNumberButton.addEventListener('click', () => {
+            const pool = ['1', '2', '3', '4'];
+            if (rerollToggle.checked) {
+                pool.push('reroll');
+            }
+
+            const randomIndex = Math.floor(Math.random() * pool.length);
+            const result = pool[randomIndex];
+
+            numberDrawResult.innerHTML = `<p>${result}</p>`;
+        });
+    }
+    // ===========================================
 
     // Helper function to setup filter buttons
     const setupFilterButtons = (containerId, filterType, allButtonDataValue) => {
