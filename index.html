@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>캐릭터 뽑기 시뮬레이터</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <h1>캐릭터 뽑기 시뮬레이터</h1>
+        <p>원하는 캐릭터를 선택하고 팀을 뽑아보세요!</p>
+    </header>
+
+    <h2>뽑힌 팀</h2>
+    <div class="selected-team-display">
+        <div class="team-cards-container" id="drawnTeamContainer">
+            <p>팀을 뽑아보세요!</p>
+        </div>
+    </div>
+    <div class="controls">
+        <div class="probability-control">
+            <label for="fiveStarWeight">5성 캐릭터 확률(4성 대비):</label>
+            <input type="number" id="fiveStarWeight" value="1.0" min="0" step="0.1">
+            <button id="updateWeightButton">확률 업데이트</button>
+        </div>
+        <button id="randomizeButton">캐릭터 4명 뽑기</button>
+        <button id="randomizeOneButton">캐릭터 1명 뽑기</button>
+        <button id="resetDrawPoolButton">뽑기 풀 초기화</button>
+    </div>
+
+    <h2>번호 뽑기</h2>
+    <div class="number-draw-container">
+        <div class="number-draw-controls">
+            <button id="drawNumberButton">번호 뽑기</button>
+            <div class="reroll-toggle-container">
+                <label for="rerollToggle">"reroll" 포함</label>
+                <input type="checkbox" id="rerollToggle" checked>
+            </div>
+            <div class="reroll-toggle-container">
+                <label for="noneToggle">"none" 포함</label>
+                <input type="checkbox" id="noneToggle">
+            </div>
+            <button id="resetNumberDrawResultButton">결과 초기화</button>
+        </div>
+        <div class="number-draw-result" id="numberDrawResult">
+            <p>버튼을 눌러 번호를 뽑아보세요.</p>
+        </div>
+    </div>
+
+    <h2>필터</h2>
+    <div class="filter-container">
+        <div class="filter-actions">
+            <button id="toggleAllSelectionButton">현재 필터링된 캐릭터 모두 선택/해제</button>
+        </div>
+        <div id="pathElementFiltersWrapper">
+            <div class="filter-section">
+                <h3>운명의 길</h3>
+                <div class="filter-buttons" id="pathFilterButtons">
+                    <button data-path="all" class="active"><span>모두</span></button>
+                    <button data-path="파멸"><img src="images/paths/destruction.webp" alt="파멸"><span>파멸</span></button>
+                    <button data-path="수렵"><img src="images/paths/hunt.webp" alt="수렵"><span>수렵</span></button>
+                    <button data-path="지식"><img src="images/paths/erudition.webp" alt="지식"><span>지식</span></button>
+                    <button data-path="공허"><img src="images/paths/nihility.webp" alt="공허"><span>공허</span></button>
+                    <button data-path="보존"><img src="images/paths/preservation.webp" alt="보존"><span>보존</span></button>
+                    <button data-path="풍요"><img src="images/paths/abundance.webp" alt="풍요"><span>풍요</span></button>
+                    <button data-path="화합"><img src="images/paths/harmony.webp" alt="화합"><span>화합</span></button>
+                    <button data-path="기억"><img src="images/paths/remembrance.webp" alt="기억"><span>기억</span></button>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <h3>원소</h3>
+                <div class="filter-buttons" id="elementFilterButtons">
+                    <button data-element="all" class="active"><span>모두</span></button>
+                    <button data-element="물리"><img src="images/elements/physical.webp" alt="물리"><span>물리</span></button>
+                    <button data-element="화염"><img src="images/elements/fire.webp" alt="화염"><span>화염</span></button>
+                    <button data-element="얼음"><img src="images/elements/ice.webp" alt="얼음"><span>얼음</span></button>
+                    <button data-element="번개"><img src="images/elements/lightning.webp" alt="번개"><span>번개</span></button>
+                    <button data-element="바람"><img src="images/elements/wind.webp" alt="바람"><span>바람</span></button>
+                    <button data-element="양자"><img src="images/elements/quantum.webp" alt="양자"><span>양자</span></button>
+                    <button data-element="허수"><img src="images/elements/imaginary.webp" alt="허수"><span>허수</span></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-section rarity-filter-section">
+            <h3>등급</h3>
+            <div class="filter-buttons" id="rarityFilterButtons">
+                <button data-rarity="all" class="active"><span>모두</span></button>
+                <button data-rarity="5">
+                    <span>5성</span>
+                    <img src="images/elements/level_star.webp" alt="5성">
+                    <img src="images/elements/level_star.webp" alt="5성">
+                    <img src="images/elements/level_star.webp" alt="5성">
+                    <img src="images/elements/level_star.webp" alt="5성">
+                    <img src="images/elements/level_star.webp" alt="5성">
+                </button>
+                <button data-rarity="4">
+                    <span>4성</span>
+                    <img src="images/elements/level_star.webp" alt="4성">
+                    <img src="images/elements/level_star.webp" alt="4성">
+                    <img src="images/elements/level_star.webp" alt="4성">
+                    <img src="images/elements/level_star.webp" alt="4성">
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <h2>캐릭터 선택</h2>
+    <div class="character-selection">
+        <div class="character-grid" id="characterGrid">
+            </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
