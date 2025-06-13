@@ -27,15 +27,31 @@
         </div>
         <button id="randomizeButton">캐릭터 4명 뽑기</button>
         <button id="randomizeOneButton">캐릭터 1명 뽑기</button>
-        <button id="toggleAllSelectionButton">선택 모두/해제</button>
         <button id="resetDrawPoolButton">뽑기 풀 초기화</button>
+    </div>
+
+    <h2>번호 뽑기</h2>
+    <div class="number-draw-container">
+        <div class="number-draw-controls">
+            <button id="drawNumberButton">번호 뽑기</button>
+            <div class="reroll-toggle-container">
+                <label for="rerollToggle">"reroll" 포함</label>
+                <input type="checkbox" id="rerollToggle" checked>
+            </div>
+        </div>
+        <div class="number-draw-result" id="numberDrawResult">
+            <p>버튼을 눌러 번호를 뽑아보세요.</p>
+        </div>
     </div>
 
     <h2>필터</h2>
     <div class="filter-container">
+        <div class="filter-actions">
+            <button id="toggleAllSelectionButton">현재 필터링된 캐릭터 모두 선택/해제</button>
+        </div>
         <div id="pathElementFiltersWrapper">
             <div class="filter-section">
-                <h3>경로</h3>
+                <h3>운명의 길</h3>
                 <div class="filter-buttons" id="pathFilterButtons">
                     <button data-path="all" class="active"><span>모두</span></button>
                     <button data-path="파멸"><img src="images/paths/destruction.webp" alt="파멸"><span>파멸</span></button>
