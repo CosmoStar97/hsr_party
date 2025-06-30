@@ -152,9 +152,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         let currentDrawPool = [];
-        tempDrawPool.forEach(char => {
-            // 이미 뽑힌 캐릭터(drawnCharacters)는 현재 뽑기 풀에서 제외
-            if (!drawnCharacters.some(dChar => dChar.name === char.name)) {
+        // 4명 뽑기 시에는 현재 선택된 캐릭터 전체에서 시작
+        // 1명 뽑기 시에는 기존 drawnCharacters를 제외한 풀에서 시작
+        if (isSingleDraw) {
+             tempDrawPool.forEach(char => {
+                // 이미 뽑힌 캐릭터(drawnCharacters)는 현재 뽑기 풀에서 제외
+                if (!drawnCharacters.some(dChar => dChar.name === char.name)) {
+                    if (char.rarity === 5) {
+                        for (let j = 0; j < fiveStarWeight * 10; j++) {
+                            currentDrawPool.push(char);
+                        }
+                    } else {
+                        for (let j = 0; j < 10; j++) {
+                            currentDrawPool.push(char);
+                        }
+                    }
+                }
+            });
+        } else { // 4명 뽑기
+            tempDrawPool.forEach(char => {
                 if (char.rarity === 5) {
                     for (let j = 0; j < fiveStarWeight * 10; j++) {
                         currentDrawPool.push(char);
@@ -164,8 +180,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         currentDrawPool.push(char);
                     }
                 }
-            }
-        });
+            });
+        }
+
 
         if (currentDrawPool.length === 0 && !isSingleDraw) { // 4명 뽑기인데 뽑을 캐릭터가 없으면
             drawnTeamContainer.innerHTML = '<p>뽑을 수 있는 캐릭터가 없습니다 (가중치 설정 또는 중복 확인).</p>';
@@ -182,8 +199,17 @@ document.addEventListener('DOMContentLoaded', () => {
         // 1명씩 뽑기일 경우, 뽑을 개수는 1개로 고정
         const actualCount = isSingleDraw ? 1 : count;
 
-        const newlyDrawn = [];
-        const currentDrawnNames = new Set(drawnCharacters.map(char => char.name)); // 현재 뽑힌 캐릭터 이름 Set
+        const newlyDrawn = []; // 현재 뽑기 세션에서 새로 뽑힌 캐릭터들을 저장할 임시 배열
+        const currentSessionPioneers = new Set(); // 현재 뽑기 세션에서 뽑힌 개척자들을 추적 (4명 뽑기 시 초기화, 1명 뽑기 시 누적)
+
+        // 이미 뽑힌 캐릭터(drawnCharacters)에 개척자가 있는지 확인 (1명 뽑기 시 초기 상태 로드)
+        if (isSingleDraw) {
+            drawnCharacters.forEach(dChar => {
+                if (dChar.name.includes('개척자')) {
+                    currentSessionPioneers.add(dChar.name);
+                }
+            });
+        }
 
         for (let i = 0; i < actualCount; i++) {
             if (currentDrawPool.length === 0) {
@@ -201,22 +227,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const isPioneer = potentialChar.name.includes('개척자');
 
-                // 이미 뽑힌 팀에 같은 캐릭터 이름이 있는지 확인
-                let isDuplicateInDrawn = currentDrawnNames.has(potentialChar.name);
-                let isPioneerConflict = false;
+                // 현재 뽑기 세션 내에서 이미 뽑힌 캐릭터(newlyDrawn)와 중복되는지 확인
+                let isDuplicateInNewlyDrawn = newlyDrawn.some(nChar => nChar.name === potentialChar.name);
+                let isPioneerConflictInSession = false;
 
-                // 이미 개척자가 뽑혔는데, 또 다른 개척자를 뽑으려는 경우
-                if (isPioneer && drawnCharacters.some(dChar => dChar.name.includes('개척자'))) {
-                    isPioneerConflict = true;
+                // 현재 뽑기 세션(newlyDrawn 또는 이전에 뽑힌 개척자)에 이미 개척자가 있고, 새로 뽑으려는 것이 개척자일 경우
+                if (isPioneer && currentSessionPioneers.size > 0) {
+                    isPioneerConflictInSession = true;
                 }
 
-                // 새로 뽑을 후보군 중복 (currentDrawPool 내에서) 및 개척자 충돌 확인
-                if (!newlyDrawn.some(nChar => nChar.name === potentialChar.name) && // 이번 회차 새로 뽑는 것 중 중복 방지
-                    !isDuplicateInDrawn && // 이미 뽑힌 팀에 중복 방지
-                    !isPioneerConflict) { // 개척자 충돌 방지
+                if (!isDuplicateInNewlyDrawn && !isPioneerConflictInSession) { // 중복 및 개척자 충돌 방지
                     characterToDraw = potentialChar;
                     newlyDrawn.push(characterToDraw);
-                    currentDrawnNames.add(characterToDraw.name); // 뽑힌 이름 세트에 추가
+                    // 개척자라면 현재 세션 개척자 Set에 추가
+                    if (isPioneer) {
+                        currentSessionPioneers.add(characterToDraw.name);
+                    }
 
                     // 뽑힌 캐릭터는 다음 뽑기에서 제외하기 위해 currentDrawPool에서 제거 (모든 인스턴스 제거)
                     currentDrawPool = currentDrawPool.filter(char => char.name !== characterToDraw.name);
@@ -321,19 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         } else {
-            // selectedCharacters.clear(); // <-- 모두 선택/해제 토글 시에는 기존 선택 유지 안함
-            selectedCharacters = new Set(filteredCharacters.map(char => char.name)); // 현재 필터에 해당하는 모든 캐릭터를 선택
-            // filteredCharacters.forEach(char => { // <-- 기존 로직 대신 Set으로 한 번에 할당
-            //     selectedCharacters.add(char.name);
-            //     const cardElement = characterGrid.querySelector(`[data-name="${char.name}"]`);
-            //     if (cardElement) {
-            //         if (char.rarity === 5) {
-            //             cardElement.classList.add('selected-5star');
-            //         } else if (char.rarity === 4) {
-            //             cardElement.classList.add('selected-4star');
-            //         }
-            //     }
-            // });
+            selectedCharacters = new Set(filteredCharacters.map(char => char.name));
         }
         renderCharacterSelection();
         resetDrawPool(); // 선택 변경 시 뽑기 풀과 뽑힌 캐릭터 초기화
