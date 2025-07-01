@@ -3,7 +3,7 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #2b2c25;
+    background-color: #2b2b2b;
     color: #e0e0e0;
     line-height: 1.6;
     display: flex;
@@ -28,7 +28,7 @@ p {
 
 /* Header Styles */
 header {
-    background-color: #3a3b34;
+    background-color: #424242;
     color: white;
     padding: 20px 0;
     width: 100%;
@@ -55,8 +55,8 @@ header h1 {
 }
 
 .controls button {
-    background-color: #4CAF50;
-    color: white;
+    background-color: #efe377;
+    color: #000000;
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
@@ -67,7 +67,7 @@ header h1 {
 }
 
 .controls button:hover {
-    background-color: #45a049;
+    background-color: #8c8746;
 }
 
 .probability-control {
@@ -86,7 +86,7 @@ header h1 {
 .probability-control input[type="number"] {
     width: 60px;
     padding: 8px;
-    border: 1px solid #555;
+    border: 1px solid #302f2f;
     border-radius: 4px;
     background-color: #3a3b34;
     color: #e0e0e0;
@@ -135,7 +135,7 @@ header h1 {
 /* ================================ */
 
 .filter-section {
-    background-color: #3a3b34;
+    background-color: #302f2f;
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
@@ -205,7 +205,7 @@ header h1 {
 }
 
 .character-card {
-    background-color: #3a3b34;
+    background-color: #302f2f;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     overflow: hidden; /* 이미지 및 내용이 카드 영역을 벗어나지 않도록 */
@@ -276,7 +276,7 @@ header h1 {
     width: 100%;
     max-width: 900px;
     margin-bottom: 30px;
-    background-color: #3a3b34;
+    background-color: #302f2f;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
@@ -300,14 +300,15 @@ header h1 {
 }
 
 .team-card {
-    background-color: #4a4b44;
+    background-color: #676766;
     border-radius: 8px;
     padding: 15px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 130px;
+    width: 100px;
+    height: 170px;
     flex-shrink: 0;
 }
 
@@ -319,8 +320,8 @@ header h1 {
 }
 
 .team-card .rarity-icon {
-    width: 1.2em; /* 크기를 약간 줄여서 밸런스 맞추기 */
-    height: 1.2em;
+    width: 1.3em; /* 크기를 약간 줄여서 밸런스 맞추기 */
+    height: 1.3em;
 }
 
 .team-card img {
@@ -332,7 +333,7 @@ header h1 {
 }
 
 .team-card p {
-    font-size: 0.9em;
+    font-size: 1em;
     font-weight: bold;
     color: #e0e0e0;
     margin-bottom: 0;
@@ -550,7 +551,7 @@ header h1 {
     width: 100%;
     max-width: 900px;
     margin-bottom: 30px;
-    background-color: #3a3b34;
+    background-color: #302f2f;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
