@@ -21,6 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const resetNumberDrawResultButton = document.getElementById('resetNumberDrawResultButton');
     // ===================================
 
+    // ===== 최상단 올리기 버튼 추가 =====
+    const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+    // ===================================
+
     // Global State Variables
     let allCharacters = []; // All character data
     let selectedCharacters = new Set(); // Currently selected character names (using Set for unique names)
@@ -96,10 +100,12 @@ document.addEventListener('DOMContentLoaded', () => {
             card.dataset.element = char.element;
             card.dataset.path = char.path;
 
-            card.innerHTML = `
-                <img src="images/characters/${char.name}.webp" alt="${char.name}">
-                <p>${char.name}</p>
-                ${createRarityStars(char.rarity)} `;
+             card.innerHTML = `
+      <img src="images/characters/${char.name}.webp" alt="${char.name}">
+      <div class="card-info">
+          <p class="character-name">${char.name}</p>
+          ${createRarityStars(char.rarity)}
+      </div>`;
 
             card.addEventListener('click', () => toggleCharacterSelection(char.name, char.rarity, card));
             characterGrid.appendChild(card);
@@ -501,6 +507,25 @@ document.addEventListener('DOMContentLoaded', () => {
     setupFilterButtons('elementFilterButtons', 'element', 'all');
 
     setupFilterButtons('rarityFilterButtons', 'rarity', 'all');
+
+    // ===== 최상단 올리기 버튼 로직 추가 =====
+    // When the user scrolls down 20px from the top of the document, show the button
+    window.onscroll = function() {
+        if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+            scrollToTopBtn.style.display = "block";
+        } else {
+            scrollToTopBtn.style.display = "none";
+        }
+    };
+
+    // When the user clicks on the button, scroll to the top of the document
+    scrollToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth' // Smooth scroll
+        });
+    });
+    // ===================================
 
     // Initial load
     fetchCharacters();
