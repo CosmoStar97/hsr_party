@@ -220,7 +220,7 @@ header h1 {
     background-size: cover; /* 이미지가 카드 영역을 채우도록 */
     background-position: center; /* 이미지를 중앙에 배치 */
     background-repeat: no-repeat; /* 이미지 반복 방지 */
-    filter: brightness(0.8); /* 기본 밝기 설정 (어둡게) */
+    filter: brightness(0.7); /* 기본 밝기 설정 (어둡게) */
 }
 
 /* 4성 캐릭터 카드 배경 이미지 */
