@@ -246,14 +246,14 @@ header h1 {
     border: 3px solid #a020f0; /* 보라색 */
     box-shadow: 0 0 15px rgba(160, 32, 240, 0.8);
     /* background-color는 이미지 위에 덮일 수 있으므로 filter로 밝기 조절 */
-    filter: brightness(1.2); /* 선택 시 밝기 높이기 */
+    filter: brightness(1.0); /* 선택 시 밝기 높이기 */
 }
 
 .character-card.selected-5star {
     border: 3px solid #ffcc00; /* 노란색 */
     box-shadow: 0 0 15px rgba(255, 204, 0, 0.8);
     /* background-color는 이미지 위에 덮일 수 있으므로 filter로 밝기 조절 */
-    filter: brightness(1.2); /* 선택 시 밝기 높이기 */
+    filter: brightness(1.0); /* 선택 시 밝기 높이기 */
 }
 
 
