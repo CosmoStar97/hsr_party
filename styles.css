@@ -220,19 +220,21 @@ header h1 {
     background-size: cover; /* 이미지가 카드 영역을 채우도록 */
     background-position: center; /* 이미지를 중앙에 배치 */
     background-repeat: no-repeat; /* 이미지 반복 방지 */
-    filter: brightness(0.7); /* 기본 밝기 설정 (어둡게) */
+    filter: brightness(0.6); /* 기본 밝기 설정 (어둡게) */
 }
 
 /* 4성 캐릭터 카드 배경 이미지 */
 .character-card[data-rarity="4"] {
     /* 여기에 4성 캐릭터용 배경 이미지 경로를 넣어주세요. */
-    background-image: url('images/backgrounds/4star_bg.webp');
+    /* 예: background-image: url('images/backgrounds/4star_bg.webp'); */
+    background-image: url('images/backgrounds/4star_bg.webp'); /* <-- 이 부분에 실제 경로를 넣어주세요! */
 }
 
 /* 5성 캐릭터 카드 배경 이미지 */
 .character-card[data-rarity="5"] {
     /* 여기에 5성 캐릭터용 배경 이미지 경로를 넣어주세요. */
-    background-image: url('images/backgrounds/5star_bg.webp');
+    /* 예: background-image: url('images/backgrounds/5star_bg.webp'); */
+    background-image: url('images/backgrounds/5star_bg.webp'); /* <-- 이 부분에 실제 경로를 넣어주세요! */
 }
 
 .character-card:hover {
@@ -265,7 +267,7 @@ header h1 {
     margin-bottom: 0; /* 이미지 아래 여백 제거 */
 }
 
-/* 새로운 정보 박스 스타일 */
+/* 공통 정보 박스 스타일 (캐릭터 카드용) */
 .character-card .card-info {
     background-color: rgba(0, 0, 0, 0.7); /* 어두운 배경에 약간 투명 */
     color: #e0e0e0;
@@ -289,18 +291,21 @@ header h1 {
 }
 
 /* 레어도 아이콘 컨테이너 스타일 (정보 박스 안으로 이동) */
-.character-card .card-info .rarity-icons-container {
+.rarity-icons-container { /* 공통 스타일로 빼내어 team-card에서도 사용 */
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 1px;
     margin: 0; /* 여백 제거 */
     height: auto;
+    position: relative; /* z-index를 적용하려면 position이 static이 아니어야 합니다. */
+    z-index: 2; /* 아이콘이 다른 요소 위에 표시되도록 우선순위를 높입니다. */
 }
 
+/* 캐릭터 카드 내 레어도 아이콘 개별 스타일 */
 .character-card .card-info .rarity-icon {
-    width: 1em; /* 아이콘 크기 조절 */
-    height: 1em;
+    width: 24px; /* 기본 아이콘 크기 (데스크톱) */
+    height: 24px;
     object-fit: contain;
     display: inline-block;
 }
@@ -309,7 +314,7 @@ header h1 {
 /* Selected Team Display Styles */
 .selected-team-display {
     width: 100%;
-    max-width: 900px;
+    max-width: 1200px;
     margin-bottom: 30px;
     background-color: #302f2f;
     padding: 20px;
@@ -323,54 +328,97 @@ header h1 {
     flex-wrap: wrap;
     justify-content: center;
     gap: 20px;
-    min-height: 180px;
+    min-height: 280px;
     align-items: center;
 }
 
 .team-cards-container p {
-    font-size: 1.2em;
+    font-size: 1.5em;
     color: #aaa;
     margin: 0;
     flex-basis: 100%;
 }
 
 .team-card {
-    background-color: #676766;
+    background-color: #676766; /* Default background if image fails */
     border-radius: 8px;
-    padding: 15px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100px;
-    height: 170px;
+    width: 140px; /* Increased width */
+    height: 230px; /* Increased height */
     flex-shrink: 0;
+    overflow: hidden; /* Important to hide overflow for image/info box */
+    position: relative;
+
+    /* Background image settings */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
-/* 팀 카드 내 rarity icon 스타일 */
-.team-card .rarity-icons-container {
-    margin-bottom: 5px; /* 이미지와 이름 사이의 간격 추가 */
-    margin-top: 0; /* 카드의 상단 패딩과의 간격 조절 */
+/* 4성 팀 카드 배경 이미지 */
+.team-card[data-rarity="4"] {
+    background-image: url('images/backgrounds/4star_bg.webp'); /* Update path if necessary */
 }
 
-.team-card .rarity-icon {
-    width: 1.3em; /* 크기를 약간 줄여서 밸런스 맞추기 */
-    height: 1.3em;
+/* 5성 팀 카드 배경 이미지 */
+.team-card[data-rarity="5"] {
+    background-image: url('images/backgrounds/5star_bg.webp'); /* Update path if necessary */
 }
 
 .team-card img {
-    width: 100px;
-    height: 100px;
+    /* Make image take up available space and remove margins */
+    width: 100%; /* Image now takes full width of card */
+    height: 65%; /* Image takes 65% of card's height */
     object-fit: cover;
-    border-radius: 5px;
-    margin-bottom: 5px; /* 이름과의 간격 */
+    border-radius: 0; /* Remove individual image border-radius */
+    border-top-left-radius: 8px; /* Match parent border-radius */
+    border-top-right-radius: 8px; /* Match parent border-radius */
+    margin: 0; /* Remove all margins around the image */
+    display: block; /* Ensure it behaves as a block element for sizing */
 }
 
-.team-card p {
-    font-size: 1em;
-    font-weight: bold;
+/* 팀 카드 내 정보 박스 스타일 */
+.team-card .card-info {
+    background-color: rgba(0, 0, 0, 0.7);
     color: #e0e0e0;
-    margin-bottom: 0;
+    padding: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    /* No margin-top needed, as it will naturally sit below the image */
+    height: 35%; /* Info box takes the remaining 35% of the card's height */
+    justify-content: center; /* Center content vertically within info box */
+}
+
+.team-card .card-info .character-name {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 팀 카드 내 레어도 아이콘 컨테이너 스타일 */
+.team-card .card-info .rarity-icons-container {
+    gap: 1px;
+}
+
+/* 팀 카드 내 레어도 아이콘 개별 스타일 */
+.team-card .card-info .rarity-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    display: inline-block;
 }
 
 
@@ -423,76 +471,88 @@ header h1 {
     }
 
     .character-grid {
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* 5열 종대로 고정 */
-        gap: 10px; /* 간격 더 줄임 */
-        padding: 10px; /* 패딩 줄임 */
-        justify-content: center; /* 중앙 정렬 */
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 10px;
+        padding: 10px;
+        justify-content: center;
     }
 
     .character-card {
-        padding: 0; /* 패딩 0으로 설정하여 정보 박스가 하단에 딱 붙도록 */
-        width: auto; /* 그리드 셀에 맞게 자동 조절 */
+        padding: 0;
+        width: auto;
         box-sizing: border-box;
         align-items: center;
     }
 
     .character-card img {
-        width: 100%; /* 부모 카드 너비에 맞춤 */
-        max-width: 80px; /* 최대 크기 설정 */
-        height: auto; /* 비율 유지 */
-        border-radius: 5px; /* 이미지 자체의 라운딩 제거 (카드 전체가 라운딩됨) */
-        margin-top: 5px; /* 카드 상단과의 여백 추가 */
+        width: 100%;
+        max-width: 80px;
+        height: auto;
+        border-radius: 5px;
+        margin-top: 5px;
     }
 
     /* 정보 박스 내부의 이름과 레어도 아이콘 크기 반응형 조절 */
     .character-card .card-info {
-        padding: 5px; /* 정보 박스 내부 패딩 줄임 */
-        gap: 2px; /* 간격 줄임 */
+        padding: 5px;
+        gap: 2px;
     }
 
     .character-card .card-info .character-name {
-        font-size: 0.7em; /* 폰트 크기 줄임 */
-        word-break: keep-all; /* 단어 단위로 줄바꿈 */
+        font-size: 0.7em;
+        word-break: keep-all;
         text-align: center;
         line-height: 1.2;
     }
 
     .character-card .card-info .rarity-icon {
-        width: 0.7em; /* 레어도 아이콘 크기 줄임 */
-        height: 0.7em;
+        width: 20px;
+        height: 20px;
     }
 
     .team-cards-container {
         gap: 15px;
-        min-height: 160px;
+        min-height: 220px;
     }
 
     .team-card {
-        width: 120px;
-        padding: 12px;
+        width: 110px;
+        height: 190px;
+        padding: 0;
+        box-shadow: none;
+        border-radius: 8px;
+        border: none;
     }
+
     .team-card img {
-        width: 80px;
-        height: 80px;
-        border-radius: 5px;
+        width: 100%; /* Image now takes full width of card */
+        height: 65%; /* Image takes 65% of card's height */
+        object-fit: cover;
+        border-radius: 0;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        margin: 0;
     }
 
-    .team-card p {
+    /* 팀 카드 내 정보 박스 스타일 (반응형) */
+    .team-card .card-info {
+        padding: 6px;
+        gap: 3px;
+        height: 35%; /* Info box takes the remaining 35% of the card's height */
+        justify-content: center; /* Center content vertically within info box */
+    }
+
+    .team-card .card-info .character-name {
         font-size: 0.9em;
-        font-weight: bold;
-        color: #e0e0e0;
-        margin-bottom: 0;
     }
 
-    /* 팀 카드 내 rarity icon 스타일 (반응형) */
-    .team-card .rarity-icons-container {
-        margin-top: 0px; /* 조절 */
-        margin-bottom: 3px; /* 조절 */
+    .team-card .card-info .rarity-icons-container {
+        gap: 1px;
     }
 
-    .team-card .rarity-icon {
-        width: 1em; /* 조절 */
-        height: 1em; /* 조절 */
+    .team-card .card-info .rarity-icon {
+        width: 18px;
+        height: 18px;
     }
 }
 
@@ -535,47 +595,65 @@ header h1 {
     }
 
     .character-grid {
-        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); /* 5열 종대로 고정 */
-        gap: 5px; /* 간격 더더욱 줄임 */
-        padding: 5px; /* 패딩 더더욱 줄임 */
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+        gap: 5px;
+        padding: 5px;
     }
     .character-card {
-        padding: 0; /* 패딩 최소화 */
+        padding: 0;
     }
     .character-card img {
-        width: 100%; /* 부모 카드 너비에 맞춤 */
-        max-width: 60px; /* 이미지 크기 조절 */
+        width: 100%;
+        max-width: 60px;
         height: auto;
     }
 
     /* 정보 박스 내부의 이름과 레어도 아이콘 크기 반응형 조절 */
     .character-card .card-info {
-        padding: 3px; /* 정보 박스 내부 패딩 줄임 */
-        gap: 1px; /* 간격 줄임 */
+        padding: 3px;
+        gap: 1px;
     }
     .character-card .card-info .character-name {
-        font-size: 0.6em; /* 폰트 크기 더 줄임 */
+        font-size: 0.6em;
         margin-top: 2px;
         margin-bottom: 2px;
         line-height: 1.1;
     }
 
     .character-card .card-info .rarity-icon {
-        width: 0.6em; /* 레어도 아이콘 크기 줄임 */
-        height: 0.6em;
+        width: 16px;
+        height: 16px;
     }
 
     .team-cards-container {
         gap: 10px;
-        min-height: 140px;
+        min-height: 200px;
     }
     .team-card {
         width: 100px;
-        padding: 10px;
+        height: 170px;
     }
     .team-card img {
-        width: 70px;
-        height: 70px;
+        width: 100%; /* Image now takes full width of card */
+        height: 65%; /* Image takes 65% of card's height */
+        object-fit: cover;
+        border-radius: 0;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        margin: 0;
+    }
+    .team-card .card-info {
+        padding: 5px;
+        gap: 2px;
+        height: 35%; /* Info box takes the remaining 35% of the card's height */
+        justify-content: center; /* Center content vertically within info box */
+    }
+    .team-card .card-info .character-name {
+        font-size: 0.7em;
+    }
+    .team-card .card-info .rarity-icon {
+        width: 16px;
+        height: 16px;
     }
 }
 
@@ -597,7 +675,7 @@ header h1 {
     align-items: center;
     gap: 20px;
     margin-bottom: 20px;
-    flex-wrap: wrap; /* 반응형을 위해 추가 */
+    flex-wrap: wrap;
 }
 
 .number-draw-controls button {
@@ -620,7 +698,7 @@ header h1 {
     align-items: center;
     gap: 8px;
     font-size: 1em;
-    white-space: nowrap; /* 텍스트가 줄바꿈되지 않도록 */
+    white-space: nowrap;
 }
 
 #rerollToggle, #noneToggle {
@@ -630,22 +708,22 @@ header h1 {
 }
 
 .number-draw-result {
-    min-height: 60px; /* 여러 결과가 표시될 때를 대비하여 최소 높이 유지 */
+    min-height: 60px;
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: #2b2c25;
     border-radius: 8px;
-    padding: 10px 20px; /* 좌우 패딩 추가 */
-    overflow-x: auto; /* 내용이 길어질 경우 스크롤 허용 */
+    padding: 10px 20px;
+    overflow-x: auto;
 }
 
 .number-draw-result p {
     margin: 0;
-    font-size: 1.8em; /* 폰트 크기 약간 줄여서 여러 숫자가 잘 보이도록 */
+    font-size: 1.8em;
     font-weight: bold;
     color: #f8f8f8;
-    white-space: nowrap; /* 결과가 한 줄에 표시되도록 */
+    white-space: nowrap;
 }
 
 /* Responsive adjustments for number-draw-controls */
@@ -666,26 +744,26 @@ header h1 {
 
 /* Scroll to Top Button */
 #scrollToTopBtn {
-    display: none; /* Hidden by default */
-    position: fixed; /* Fixed/sticky position */
-    bottom: 20px; /* Place the button at the bottom of the page */
-    right: 30px; /* Place the button 30px from the right */
-    z-index: 99; /* Make sure it does not overlap */
-    border: none; /* Remove borders */
-    outline: none; /* Remove outline */
-    background-color: transparent; /* 배경색 제거 */
-    color: white; /* Text color */
-    cursor: pointer; /* Add a mouse pointer on hover */
-    padding: 0; /* padding 제거 */
-    border-radius: 10px; /* Rounded corners */
-    font-size: 1em; /* Increase font size */
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 30px;
+    z-index: 99;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    color: white;
+    cursor: pointer;
+    padding: 0;
+    border-radius: 10px;
+    font-size: 1em;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     transition: background-color 0.3s, opacity 0.3s;
 }
 
 #scrollToTopBtn:hover {
-    background-color: #424242; /* Add a darker background on hover */
+    background-color: #424242;
     opacity: 0.9;
-    border: 3px solid #ffcc00; /* 노란색 */
+    border: 3px solid #ffcc00;
     box-shadow: 0 0 15px rgba(255, 204, 0, 0.8);
 }
