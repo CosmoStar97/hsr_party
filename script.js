@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const randomizeButton = document.getElementById('randomizeButton'); // Draw 4 button
     const randomizeOneButton = document.getElementById('randomizeOneButton'); // Draw 1 button
     const drawnTeamContainer = document.getElementById('drawnTeamContainer');
-    const fiveStarWeightInput = document.getElementById('fiveStarWeight');
+    const fourStarWeightInput = document.getElementById('fourStarWeight'); // fiveStarWeight -> fourStarWeight
     const updateWeightButton = document.getElementById('updateWeightButton');
     const toggleAllSelectionButton = document.getElementById('toggleAllSelectionButton'); // Toggle all selected/deselected button
     const resetDrawPoolButton = document.getElementById('resetDrawPoolButton'); // 새로 추가된 뽑기 풀 초기화 버튼
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Global State Variables
     let allCharacters = []; // All character data
     let selectedCharacters = new Set(); // Currently selected character names (using Set for unique names)
-    let fiveStarWeight = 1.0; // Probability multiplier for 5-star characters
+    let fourStarWeight = 1.0; // Probability multiplier for 4-star characters (fiveStarWeight -> fourStarWeight)
     let drawnCharacters = []; // 1명씩 뽑을 때 현재 뽑힌 캐릭터들을 저장
 
     let drawnNumbers = []; // 번호 뽑기에서 뽑힌 숫자들을 저장할 배열
@@ -158,11 +158,11 @@ document.addEventListener('DOMContentLoaded', () => {
              tempDrawPool.forEach(char => {
                 // 이미 뽑힌 캐릭터(drawnCharacters)는 현재 뽑기 풀에서 제외
                 if (!drawnCharacters.some(dChar => dChar.name === char.name)) {
-                    if (char.rarity === 5) {
-                        for (let j = 0; j < fiveStarWeight * 10; j++) {
+                    if (char.rarity === 4) { // 4성 캐릭터 확률 가중치 적용
+                        for (let j = 0; j < fourStarWeight * 10; j++) { // fourStarWeight 적용
                             currentDrawPool.push(char);
                         }
-                    } else {
+                    } else { // 5성 캐릭터는 기본 가중치
                         for (let j = 0; j < 10; j++) {
                             currentDrawPool.push(char);
                         }
@@ -171,11 +171,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         } else { // 4명 뽑기
             tempDrawPool.forEach(char => {
-                if (char.rarity === 5) {
-                    for (let j = 0; j < fiveStarWeight * 10; j++) {
+                if (char.rarity === 4) { // 4성 캐릭터 확률 가중치 적용
+                    for (let j = 0; j < fourStarWeight * 10; j++) { // fourStarWeight 적용
                         currentDrawPool.push(char);
                     }
-                } else {
+                } else { // 5성 캐릭터는 기본 가중치
                     for (let j = 0; j < 10; j++) {
                         currentDrawPool.push(char);
                     }
@@ -318,13 +318,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     updateWeightButton.addEventListener('click', () => {
-        const newWeight = parseFloat(fiveStarWeightInput.value);
+        const newWeight = parseFloat(fourStarWeightInput.value); // fiveStarWeightInput -> fourStarWeightInput
         if (!isNaN(newWeight) && newWeight >= 0) {
-            fiveStarWeight = newWeight;
-            console.log('5성 캐릭터 확률 가중치 업데이트:', fiveStarWeight);
+            fourStarWeight = newWeight; // fiveStarWeight -> fourStarWeight
+            console.log('4성 캐릭터 확률 가중치 업데이트:', fourStarWeight); // 메시지 변경
         } else {
             alert('유효한 숫자를 입력해주세요.');
-            fiveStarWeightInput.value = fiveStarWeight;
+            fourStarWeightInput.value = fourStarWeight; // fiveStarWeight -> fourStarWeight
         }
     });
 
