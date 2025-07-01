@@ -93,7 +93,7 @@ header h1 {
     font-size: 1em;
 }
 
-/* ===== 수정/추가된 스타일 ===== */
+/* Filter Sections */
 .filter-container {
     display: flex;
     flex-direction: column;
@@ -132,7 +132,6 @@ header h1 {
     gap: 20px;
     justify-content: center;
 }
-/* ================================ */
 
 .filter-section {
     background-color: #302f2f;
@@ -205,71 +204,107 @@ header h1 {
 }
 
 .character-card {
-    background-color: #302f2f;
+    background-color: #302f2f; /* 이미지 로드 실패 시 또는 투명도 조절용 기본 배경색 */
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    overflow: hidden; /* 이미지 및 내용이 카드 영역을 벗어나지 않도록 */
+    overflow: hidden;
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.2s ease; /* border transition 추가 */
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.2s ease, filter 0.2s ease;
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* 이미지 -> 정보 박스 순서로 세로 배치 */
     align-items: center;
-    padding: 15px;
-    position: relative; /* 선택 표시를 위해 */
+    position: relative;
     border: 3px solid transparent; /* 기본 투명 테두리 */
+
+    /* 배경 이미지 설정 */
+    background-size: cover; /* 이미지가 카드 영역을 채우도록 */
+    background-position: center; /* 이미지를 중앙에 배치 */
+    background-repeat: no-repeat; /* 이미지 반복 방지 */
+    filter: brightness(0.8); /* 기본 밝기 설정 (어둡게) */
+}
+
+/* 4성 캐릭터 카드 배경 이미지 */
+.character-card[data-rarity="4"] {
+    /* 여기에 4성 캐릭터용 배경 이미지 경로를 넣어주세요. */
+    background-image: url('images/backgrounds/4star_bg.webp');
+}
+
+/* 5성 캐릭터 카드 배경 이미지 */
+.character-card[data-rarity="5"] {
+    /* 여기에 5성 캐릭터용 배경 이미지 경로를 넣어주세요. */
+    background-image: url('images/backgrounds/5star_bg.webp');
 }
 
 .character-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    filter: brightness(0.9); /* 호버 시 약간 밝게 */
 }
 
-/* 4성, 5성 선택 시 테두리 색상 */
+/* 4성, 5성 선택 시 테두리 색상 및 밝기 조절 */
 .character-card.selected-4star {
     border: 3px solid #a020f0; /* 보라색 */
     box-shadow: 0 0 15px rgba(160, 32, 240, 0.8);
-    background-color: #4a4b44;
+    /* background-color는 이미지 위에 덮일 수 있으므로 filter로 밝기 조절 */
+    filter: brightness(1.2); /* 선택 시 밝기 높이기 */
 }
 
 .character-card.selected-5star {
     border: 3px solid #ffcc00; /* 노란색 */
     box-shadow: 0 0 15px rgba(255, 204, 0, 0.8);
-    background-color: #4a4b44;
+    /* background-color는 이미지 위에 덮일 수 있으므로 filter로 밝기 조절 */
+    filter: brightness(1.2); /* 선택 시 밝기 높이기 */
 }
 
 
 .character-card img {
     width: 120px;
     height: 120px;
-    object-fit: cover; /* 이미지가 잘리지 않고 카드를 채우도록 */
+    object-fit: cover;
     border-radius: 5px;
-    margin-bottom: 5px;
+    margin-bottom: 0; /* 이미지 아래 여백 제거 */
 }
 
-.character-card p {
+/* 새로운 정보 박스 스타일 */
+.character-card .card-info {
+    background-color: rgba(0, 0, 0, 0.7); /* 어두운 배경에 약간 투명 */
+    color: #e0e0e0;
+    padding: 8px;
+    width: 100%; /* 카드 너비에 맞춰 꽉 채우기 */
+    box-sizing: border-box; /* 패딩이 너비에 포함되도록 */
+    text-align: center;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px; /* 이름과 레어도 사이 간격 */
+    margin-top: auto; /* 카드 하단에 붙도록 (flex container에서) */
+}
+
+.character-card .card-info .character-name {
     font-size: 1em;
     font-weight: bold;
-    color: #e0e0e0;
+    margin: 0; /* 기본 마진 제거 */
 }
 
-/* Rarity Stars in Character Card */
-.rarity-icons-container {
-    position: relative;
+/* 레어도 아이콘 컨테이너 스타일 (정보 박스 안으로 이동) */
+.character-card .card-info .rarity-icons-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 0;
-    margin-bottom: 0;
-    height: auto;
     gap: 1px;
+    margin: 0; /* 여백 제거 */
+    height: auto;
 }
 
-.character-card .rarity-icon {
-    width: 1.5em;
-    height: 1.5em;
+.character-card .card-info .rarity-icon {
+    width: 1em; /* 아이콘 크기 조절 */
+    height: 1em;
     object-fit: contain;
     display: inline-block;
 }
+
 
 /* Selected Team Display Styles */
 .selected-team-display {
@@ -312,9 +347,8 @@ header h1 {
     flex-shrink: 0;
 }
 
-/* 팀 카드 내 rarity icon 스타일 (이전 요청의 변경 사항 유지) */
+/* 팀 카드 내 rarity icon 스타일 */
 .team-card .rarity-icons-container {
-    /* order: -1; 이전 요청의 변경 사항 유지 */
     margin-bottom: 5px; /* 이미지와 이름 사이의 간격 추가 */
     margin-top: 0; /* 카드의 상단 패딩과의 간격 조절 */
 }
@@ -389,15 +423,14 @@ header h1 {
     }
 
     .character-grid {
-        /* 기존 : repeat(auto-fill, minmax(120px, 1fr)); */
-        grid-template-columns: repeat(5, 1fr); /* 5열 종대로 고정 */
-        gap: 5px; /* 간격 더 줄임 */
-        padding: 5px; /* 패딩 줄임 */
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* 5열 종대로 고정 */
+        gap: 10px; /* 간격 더 줄임 */
+        padding: 10px; /* 패딩 줄임 */
         justify-content: center; /* 중앙 정렬 */
     }
 
     .character-card {
-        padding: 5px; /* 패딩 더 줄임 */
+        padding: 0; /* 패딩 0으로 설정하여 정보 박스가 하단에 딱 붙도록 */
         width: auto; /* 그리드 셀에 맞게 자동 조절 */
         box-sizing: border-box;
         align-items: center;
@@ -405,28 +438,28 @@ header h1 {
 
     .character-card img {
         width: 100%; /* 부모 카드 너비에 맞춤 */
-        max-width: 60px; /* 최대 크기 설정 */
+        max-width: 80px; /* 최대 크기 설정 */
         height: auto; /* 비율 유지 */
-        border-radius: 0;
+        border-radius: 5px; /* 이미지 자체의 라운딩 제거 (카드 전체가 라운딩됨) */
+        margin-top: 5px; /* 카드 상단과의 여백 추가 */
     }
 
-    .character-card p {
-        font-size: 0.6em; /* 폰트 크기 줄임 */
+    /* 정보 박스 내부의 이름과 레어도 아이콘 크기 반응형 조절 */
+    .character-card .card-info {
+        padding: 5px; /* 정보 박스 내부 패딩 줄임 */
+        gap: 2px; /* 간격 줄임 */
+    }
+
+    .character-card .card-info .character-name {
+        font-size: 0.7em; /* 폰트 크기 줄임 */
         word-break: keep-all; /* 단어 단위로 줄바꿈 */
         text-align: center;
         line-height: 1.2;
-        margin-bottom: 2px;
     }
 
-    .rarity-icons-container {
-        margin-top: 0;
-        margin-bottom: 0;
-        gap: 0.5px;
-    }
-
-    .character-card .rarity-icon {
-        width: 0.4em;
-        height: 0.4em;
+    .character-card .card-info .rarity-icon {
+        width: 0.7em; /* 레어도 아이콘 크기 줄임 */
+        height: 0.7em;
     }
 
     .team-cards-container {
@@ -441,7 +474,7 @@ header h1 {
     .team-card img {
         width: 80px;
         height: 80px;
-        border-radius: 0;
+        border-radius: 5px;
     }
 
     .team-card p {
@@ -502,34 +535,34 @@ header h1 {
     }
 
     .character-grid {
-        grid-template-columns: repeat(5, 1fr); /* 5열 종대로 고정 */
-        gap: 3px; /* 간격 더더욱 줄임 */
-        padding: 3px; /* 패딩 더더욱 줄임 */
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); /* 5열 종대로 고정 */
+        gap: 5px; /* 간격 더더욱 줄임 */
+        padding: 5px; /* 패딩 더더욱 줄임 */
     }
     .character-card {
-        padding: 3px; /* 패딩 최소화 */
+        padding: 0; /* 패딩 최소화 */
     }
     .character-card img {
         width: 100%; /* 부모 카드 너비에 맞춤 */
-        max-width: 50px; /* 이미지 크기 조절 */
+        max-width: 60px; /* 이미지 크기 조절 */
         height: auto;
     }
-    .character-card p {
-        font-size: 0.5em; /* 폰트 크기 더 줄임 */
+
+    /* 정보 박스 내부의 이름과 레어도 아이콘 크기 반응형 조절 */
+    .character-card .card-info {
+        padding: 3px; /* 정보 박스 내부 패딩 줄임 */
+        gap: 1px; /* 간격 줄임 */
+    }
+    .character-card .card-info .character-name {
+        font-size: 0.6em; /* 폰트 크기 더 줄임 */
         margin-top: 2px;
         margin-bottom: 2px;
         line-height: 1.1;
     }
 
-    .rarity-icons-container {
-        margin-top: 0;
-        margin-bottom: 0;
-        gap: 0.5px;
-    }
-
-    .character-card .rarity-icon {
-        width: 0.3em;
-        height: 0.3em;
+    .character-card .card-info .rarity-icon {
+        width: 0.6em; /* 레어도 아이콘 크기 줄임 */
+        height: 0.6em;
     }
 
     .team-cards-container {
@@ -546,7 +579,7 @@ header h1 {
     }
 }
 
-/* 번호 뽑기 스타일 */
+/* Number Draw Section Styles */
 .number-draw-container {
     width: 100%;
     max-width: 900px;
@@ -582,7 +615,7 @@ header h1 {
     background-color: #0056b3;
 }
 
-.reroll-toggle-container { /* draw-count-selector 스타일 제거 */
+.reroll-toggle-container {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -595,17 +628,6 @@ header h1 {
     height: 18px;
     cursor: pointer;
 }
-
-/* #numberDrawCount { /* 새로운 드롭다운 스타일 */
-/* padding: 5px 8px; */
-/* border-radius: 4px; */
-/* border: 1px solid #555; */
-/* background-color: #3a3b34; */
-/* color: #e0e0e0; */
-/* font-size: 0.9em; */
-/* cursor: pointer; */
-/* } */ /* 이 스타일을 제거합니다. */
-
 
 .number-draw-result {
     min-height: 60px; /* 여러 결과가 표시될 때를 대비하여 최소 높이 유지 */
@@ -626,13 +648,13 @@ header h1 {
     white-space: nowrap; /* 결과가 한 줄에 표시되도록 */
 }
 
-/* 반응형 조정 for number-draw-controls */
+/* Responsive adjustments for number-draw-controls */
 @media (max-width: 600px) {
     .number-draw-controls {
         flex-direction: column;
         gap: 10px;
     }
-    .reroll-toggle-container { /* draw-count-selector 스타일 제거 */
+    .reroll-toggle-container {
         width: 100%;
         justify-content: center;
     }
@@ -640,4 +662,30 @@ header h1 {
         width: 90%;
         max-width: 250px;
     }
+}
+
+/* Scroll to Top Button */
+#scrollToTopBtn {
+    display: none; /* Hidden by default */
+    position: fixed; /* Fixed/sticky position */
+    bottom: 20px; /* Place the button at the bottom of the page */
+    right: 30px; /* Place the button 30px from the right */
+    z-index: 99; /* Make sure it does not overlap */
+    border: none; /* Remove borders */
+    outline: none; /* Remove outline */
+    background-color: transparent; /* 배경색 제거 */
+    color: white; /* Text color */
+    cursor: pointer; /* Add a mouse pointer on hover */
+    padding: 0; /* padding 제거 */
+    border-radius: 10px; /* Rounded corners */
+    font-size: 1em; /* Increase font size */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s, opacity 0.3s;
+}
+
+#scrollToTopBtn:hover {
+    background-color: #424242; /* Add a darker background on hover */
+    opacity: 0.9;
+    border: 3px solid #ffcc00; /* 노란색 */
+    box-shadow: 0 0 15px rgba(255, 204, 0, 0.8);
 }
