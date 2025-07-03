@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const rerollToggle = document.getElementById('rerollToggle');
     const noneToggle = document.getElementById('noneToggle');
     const numberDrawResult = document.getElementById('numberDrawResult');
-    const resetNumberDrawResultButton = document.getElementById('resetDrawResultButton'); // ID 수정: resetNumberDrawResultButton
+    const resetNumberDrawResultButton = document.getElementById('resetNumberDrawResultButton');
 
     let characters = []; // 전체 캐릭터 데이터
     let selectedCharacters = new Set(); // 사용자가 선택한 캐릭터 (뽑기 풀)
@@ -200,18 +200,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 캐릭터 뽑기 함수 (단일 캐릭터)
-    function drawCharacter() {
-        if (selectedCharacters.size === 0) {
-            alert('뽑을 수 있는 캐릭터가 없습니다. 캐릭터를 선택해주세요.');
-            return null;
-        }
-
-        const selectableCharacters = characters.filter(char => selectedCharacters.has(char.name));
-
-        // 가중치 적용하여 뽑을 캐릭터 풀 생성
+    // New helper function to create a weighted pool from a given array of characters
+    function getWeightedPool(charsToWeight) {
         const weightedPool = [];
-        selectableCharacters.forEach(char => {
+        charsToWeight.forEach(char => {
             if (char.rarity === 5) {
                 weightedPool.push(char); // 5성은 기본 가중치 1
             } else if (char.rarity === 4) {
@@ -221,14 +213,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
+        return weightedPool;
+    }
 
-        if (weightedPool.length === 0) {
-            alert('가중치가 적용된 캐릭터 풀에 캐릭터가 없습니다. 4성 가중치를 확인하거나 다른 캐릭터를 선택해주세요.');
-            return null;
+    // Modified drawCharacter function to draw a unique character from a given pool
+    // It returns the drawn character and the updated pool (without the drawn character)
+    function drawCharacterFromPool(pool) {
+        if (pool.length === 0) {
+            return { char: null, remainingPool: [] };
         }
 
-        const randomIndex = Math.floor(Math.random() * weightedPool.length);
-        return weightedPool[randomIndex];
+        const weightedPool = getWeightedPool(pool); // Get weighted pool from the *current* pool
+
+        if (weightedPool.length === 0) {
+            // This case indicates that even with weighting, there are no valid characters to draw.
+            return { char: null, remainingPool: pool };
+        }
+
+        const randomIndexInWeightedPool = Math.floor(Math.random() * weightedPool.length);
+        const drawnChar = weightedPool[randomIndexInWeightedPool];
+
+        // Find the actual index of the drawn character in the original 'pool'
+        let originalPoolIndex = pool.findIndex(c => c.name === drawnChar.name);
+
+        // Create a new array without the drawn character
+        const remainingPool = [...pool];
+        if (originalPoolIndex !== -1) {
+            remainingPool.splice(originalPoolIndex, 1);
+        }
+
+        return { char: drawnChar, remainingPool: remainingPool };
     }
 
     // 뽑힌 팀 렌더링
@@ -286,17 +300,67 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Helper function to check if a character is a Trailblazer
+    function isTrailblazer(char) {
+        return char.name.startsWith('개척자');
+    }
+
+    // New helper function to check if a character is '삼칠이' or '검칠이'
+    function isSevenOrBlackSeven(char) {
+        // characters.json에 '검칠이'가 없으면 이 조건은 '삼칠이'에 대해서만 작동합니다.
+        return char.name === '삼칠이' || char.name === '검칠이';
+    }
+
     // ===== 이벤트 리스너 =====
 
     // "캐릭터 4명 뽑기" 버튼
     randomizeButton.addEventListener('click', () => {
+        if (selectedCharacters.size === 0) {
+            alert('뽑을 수 있는 캐릭터가 없습니다. 캐릭터를 선택해주세요.');
+            return;
+        }
+
         drawnTeam = []; // 4명 뽑기 시 기존 팀 초기화
+        let availableCharactersForSession = characters.filter(char => selectedCharacters.has(char.name));
+
         for (let i = 0; i < 4; i++) {
-            const char = drawCharacter();
-            if (char) {
-                drawnTeam.push(char);
+            // Determine the pool for this specific draw
+            let poolForThisDraw = [...availableCharactersForSession];
+
+            // 개척자 중복 방지 로직
+            const hasTrailblazerInDrawnTeam = drawnTeam.some(char => isTrailblazer(char));
+            if (hasTrailblazerInDrawnTeam) {
+                poolForThisDraw = poolForThisDraw.filter(char => !isTrailblazer(char));
+            }
+
+            // 삼칠이/검칠이 중복 방지 로직 추가
+            const hasSevenOrBlackSevenInDrawnTeam = drawnTeam.some(char => isSevenOrBlackSeven(char));
+            if (hasSevenOrBlackSevenInDrawnTeam) {
+                poolForThisDraw = poolForThisDraw.filter(char => !isSevenOrBlackSeven(char));
+            }
+
+
+            const { char: drawnChar } = drawCharacterFromPool(poolForThisDraw);
+
+            if (drawnChar) {
+                drawnTeam.push(drawnChar);
+
+                // Update the session's available characters:
+                // 1. Remove the drawn character.
+                availableCharactersForSession = availableCharactersForSession.filter(c => c.name !== drawnChar.name);
+
+                // 2. If the drawn character is a Trailblazer, remove all other Trailblazer variants
+                //    from the session's available characters to prevent drawing another one later.
+                if (isTrailblazer(drawnChar)) {
+                    availableCharactersForSession = availableCharactersForSession.filter(c => !isTrailblazer(c));
+                }
+                // 3. If the drawn character is 삼칠이 or 검칠이, remove all others from that group
+                if (isSevenOrBlackSeven(drawnChar)) {
+                    availableCharactersForSession = availableCharactersForSession.filter(c => !isSevenOrBlackSeven(c));
+                }
+
             } else {
-                drawnTeam = []; // 오류 발생 시 팀 초기화
+                alert('더 이상 뽑을 수 있는 캐릭터가 없습니다. 선택된 캐릭터 수를 확인해주세요.');
                 break;
             }
         }
@@ -305,14 +369,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // "캐릭터 1명 뽑기" 버튼
     randomizeOneButton.addEventListener('click', () => {
-        const char = drawCharacter();
-        if (char) {
-            // drawnTeam에 추가하고, 4명을 초과하면 가장 오래된(첫 번째) 캐릭터 제거
-            drawnTeam.push(char);
+        if (selectedCharacters.size === 0) {
+            alert('뽑을 수 있는 캐릭터가 없습니다. 캐릭터를 선택해주세요.');
+            return;
+        }
+
+        // Create a pool of characters that are selected AND not currently in drawnTeam
+        let availableForOneDraw = characters.filter(char =>
+            selectedCharacters.has(char.name) && !drawnTeam.some(dChar => dChar.name === char.name)
+        );
+
+        // 개척자 중복 방지 로직
+        const hasTrailblazerInDrawnTeam = drawnTeam.some(char => isTrailblazer(char));
+        if (hasTrailblazerInDrawnTeam) {
+            availableForOneDraw = availableForOneDraw.filter(char => !isTrailblazer(char));
+        }
+
+        // 삼칠이/검칠이 중복 방지 로직 추가
+        const hasSevenOrBlackSevenInDrawnTeam = drawnTeam.some(char => isSevenOrBlackSeven(char));
+        if (hasSevenOrBlackSevenInDrawnTeam) {
+            availableForOneDraw = availableForOneDraw.filter(char => !isSevenOrBlackSeven(char));
+        }
+
+
+        if (availableForOneDraw.length === 0) {
+             alert('더 이상 뽑을 수 있는 캐릭터가 없습니다. 모든 선택된 캐릭터가 현재 팀에 포함되어 있거나, 다른 개척자/삼칠이/검칠이가 이미 팀에 있습니다.');
+             return;
+        }
+
+        const { char: newChar } = drawCharacterFromPool(availableForOneDraw);
+        if (newChar) {
+            // Add the new character to the team
+            drawnTeam.push(newChar);
+            // If the team size exceeds 4, remove the oldest character
             if (drawnTeam.length > 4) {
-                drawnTeam.shift(); // 배열의 첫 번째 요소 제거
+                drawnTeam.shift();
             }
             renderDrawnTeam();
+        } else {
+            alert('캐릭터를 뽑지 못했습니다. 선택된 캐릭터와 팀 상태를 확인해주세요.');
         }
     });
 
@@ -376,57 +471,77 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setupFilterButtons('rarityFilterButtons', 'rarity', 'all');
 
+    // Array to store the last 4 drawn numbers for the number draw feature
+    let drawnNumbersHistory = [];
+    const MAX_NUMBER_DRAW_HISTORY = 4; // Define maximum history size
+
+    // Function to render the drawn number history
+    function renderNumberDrawHistory() {
+        if (drawnNumbersHistory.length === 0) {
+            numberDrawResult.innerHTML = '<p>번호를 뽑아보세요!</p>';
+        } else {
+            // Clear existing content
+            numberDrawResult.innerHTML = '';
+            // Create a single <p> tag for the joined string
+            const p = document.createElement('p');
+            p.textContent = drawnNumbersHistory.join(', '); // 수정된 부분: 쉼표로 구분하여 표시
+            numberDrawResult.appendChild(p);
+        }
+    }
+
     // ===== 번호 뽑기 기능 =====
     if (drawNumberButton && numberDrawResult) {
         drawNumberButton.addEventListener('click', () => {
-            let min = 1;
-            let max = 99;
-            let result;
+            let resultValue;
+            const isRerollChecked = rerollToggle.checked;
+            const isNoneChecked = noneToggle.checked;
 
-            if (rerollToggle.checked) {
-                // 리롤 ON: 1~90 (90%) 또는 91~99 (10%)
-                const randomNumber = Math.random();
-                if (randomNumber < 0.9) { // 90% 확률로 1~90
-                    result = Math.floor(Math.random() * 90) + 1;
-                } else { // 10% 확률로 91~99
-                    result = Math.floor(Math.random() * 9) + 91;
+            // 기본적으로 1~4 사이의 숫자를 뽑는 함수
+            const getRandomNumber = () => Math.floor(Math.random() * 4) + 1;
+
+            if (isRerollChecked && isNoneChecked) {
+                const rand = Math.random();
+                if (rand < 0.3) {
+                    resultValue = '모든팀 바꾸기';
+                } else if (rand < 0.6) {
+                    resultValue = '바꾸지 않기';
+                } else {
+                    resultValue = getRandomNumber();
                 }
-            } else if (noneToggle.checked) {
-                // None ON: 1~75 (90%) 또는 76~99 (10%)
-                const randomNumber = Math.random();
-                if (randomNumber < 0.9) { // 90% 확률로 1~75
-                    result = Math.floor(Math.random() * 75) + 1;
-                } else { // 10% 확률로 76~99
-                    result = Math.floor(Math.random() * 24) + 76;
+            } else if (isRerollChecked) {
+                if (Math.random() < 0.5) {
+                    resultValue = '모든팀 바꾸기';
+                } else {
+                    resultValue = getRandomNumber();
+                }
+            }
+            else if (isNoneChecked) {
+                if (Math.random() < 0.5) {
+                    resultValue = '바꾸지 않기';
+                } else {
+                    resultValue = getRandomNumber();
                 }
             } else {
-                // 둘 다 OFF: 1~99
-                result = Math.floor(Math.random() * (max - min + 1)) + min;
+                resultValue = getRandomNumber();
             }
 
-            numberDrawResult.textContent = `뽑힌 번호: ${result}`;
-        });
-    }
+            // Add the new result to history
+            drawnNumbersHistory.push(resultValue);
 
-    // 토글 버튼들이 동시에 활성화되지 않도록
-    if (rerollToggle && noneToggle) {
-        rerollToggle.addEventListener('change', () => {
-            if (rerollToggle.checked) {
-                noneToggle.checked = false;
+            // Maintain maximum history size
+            if (drawnNumbersHistory.length > MAX_NUMBER_DRAW_HISTORY) {
+                drawnNumbersHistory.shift(); // Remove the oldest result
             }
-        });
 
-        noneToggle.addEventListener('change', () => {
-            if (noneToggle.checked) {
-                rerollToggle.checked = false;
-            }
+            renderNumberDrawHistory(); // Render the updated history
         });
     }
 
     // 번호 뽑기 결과 초기화 버튼
     if (resetNumberDrawResultButton && numberDrawResult) {
         resetNumberDrawResultButton.addEventListener('click', () => {
-            numberDrawResult.textContent = '번호를 뽑아보세요!';
+            drawnNumbersHistory = []; // Clear the history
+            renderNumberDrawHistory(); // Render the empty history
         });
     }
 
@@ -455,4 +570,5 @@ document.addEventListener('DOMContentLoaded', () => {
     // 초기 로드
     loadCharacters();
     renderDrawnTeam(); // 초기에는 '팀을 뽑아보세요!' 메시지 표시
+    renderNumberDrawHistory(); // 초기에는 '번호를 뽑아보세요!' 메시지 표시
 });
